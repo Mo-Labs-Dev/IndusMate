@@ -1,54 +1,118 @@
+import { useEffect, useState } from "react";
+import api from "../services/api";
 import StatCard from "./StatCard";
 
+type DashboardSummary = {
+  factoryHealth: number;
+  productionToday: number;
+  productionTarget: number;
+  attendanceToday: number;
+  attendanceTarget: number;
+  machinesRunning: number;
+  machinesTotal: number;
+  energyUsage: number;
+  downtimeMinutes: number;
+  activeAlerts: number;
+  budgetUsed: number;
+};
+
 export default function KpiGrid() {
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function loadSummary() {
+      try {
+        setError("");
+
+        const response = await api.get<DashboardSummary>(
+          "/dashboard/summary"
+        );
+
+        setSummary(response.data);
+      } catch {
+        setError("Could not load dashboard summary.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadSummary();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 text-slate-500 shadow-sm">
+        Loading dashboard summary...
+      </div>
+    );
+  }
+
+  if (error || !summary) {
+    return (
+      <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-red-700">
+        {error || "Dashboard summary is unavailable."}
+      </div>
+    );
+  }
+
+  const productionPercent = Math.round(
+    (summary.productionToday / summary.productionTarget) * 100
+  );
+
   return (
-    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <StatCard
         title="Factory Health"
-        value="98%"
+        value={`${summary.factoryHealth}%`}
         description="All major systems are operating normally."
       />
 
       <StatCard
         title="Production Today"
-        value="4,620 / 5,000"
-        description="92% of today’s target completed."
+        value={`${summary.productionToday.toLocaleString()} / ${summary.productionTarget.toLocaleString()}`}
+        description={`${productionPercent}% of today’s target completed.`}
       />
 
       <StatCard
         title="Attendance Today"
-        value="186 / 200"
-        description="14 employees are absent or on leave."
+        value={`${summary.attendanceToday} / ${summary.attendanceTarget}`}
+        description={`${
+          summary.attendanceTarget - summary.attendanceToday
+        } employees are absent or on leave.`}
       />
 
       <StatCard
         title="Machines Running"
-        value="46 / 48"
-        description="Two machines require attention."
+        value={`${summary.machinesRunning} / ${summary.machinesTotal}`}
+        description={`${
+          summary.machinesTotal - summary.machinesRunning
+        } machines require attention.`}
       />
 
       <StatCard
         title="Energy Usage"
-        value="18.2 MWh"
-        description="4% lower than last week."
+        value={`${summary.energyUsage} MWh`}
+        description="Current factory energy consumption."
       />
 
       <StatCard
         title="Downtime Today"
-        value="38 min"
-        description="12 minutes below the daily limit."
+        value={`${summary.downtimeMinutes} min`}
+        description="Total downtime across all production lines."
       />
 
       <StatCard
         title="Active Alerts"
-        value="2"
-        description="One critical and one warning."
+        value={String(summary.activeAlerts)}
+        description="Alerts currently requiring attention."
       />
 
       <StatCard
         title="Budget Used"
-        value="72%"
-        description="₹18.2M used from ₹25M."
+        value={`${summary.budgetUsed}%`}
+        description="Current operational budget usage."
       />
     </div>
   );
