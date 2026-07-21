@@ -6,12 +6,16 @@ import LiveMachines from "../components/LiveMachines";
 import OrdersPanel from "../components/OrdersPanel";
 import ProductionChart from "../components/ProductionChart";
 import DashboardLayout from "../layouts/DashboardLayout";
+import BoltReadingCard from "../components/BoltReadingCard";
 
 export default function DashboardPage() {
   return (
     <DashboardLayout>
       {/* Welcome Banner */}
       <DashboardBanner />
+      <div className="mt-6">
+  <BoltReadingCard />
+</div>
 
       {/* KPI Cards */}
       <KpiGrid />
