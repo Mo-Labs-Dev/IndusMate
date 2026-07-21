@@ -1,14 +1,10 @@
 package com.shafilabs.indusmate.controller;
 
+import com.shafilabs.indusmate.entity.BoltReading;
 import com.shafilabs.indusmate.service.BoltService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/bolt")
@@ -22,16 +18,12 @@ public class BoltController {
     }
 
     @GetMapping("/reading")
-    public Map<String, Object> getReading() {
-        int value = boltService.readAnalogValue();
+    public BoltReading getReading() {
+        return boltService.readAndSaveAnalogValue();
+    }
 
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("deviceId", "BOLT6470541");
-        response.put("pin", "A0");
-        response.put("sensorType", "light");
-        response.put("value", value);
-        response.put("timestamp", LocalDateTime.now());
-
-        return response;
+    @GetMapping("/history")
+    public List<BoltReading> getHistory() {
+        return boltService.getHistory();
     }
 }

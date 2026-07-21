@@ -1,24 +1,36 @@
 package com.shafilabs.indusmate.service;
 
+import com.shafilabs.indusmate.entity.BoltReading;
+import com.shafilabs.indusmate.repository.BoltReadingRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class BoltService {
 
     private final RestClient restClient;
+    private final BoltReadingRepository boltReadingRepository;
+    private final AlertStore alertStore;
+
     private final String apiKey;
     private final String deviceId;
     private final String pin;
 
     public BoltService(
+            BoltReadingRepository boltReadingRepository,
+            AlertStore alertStore,
             @Value("${bolt.api-key}") String apiKey,
             @Value("${bolt.device-id}") String deviceId,
             @Value("${bolt.pin:A0}") String pin
     ) {
+        this.boltReadingRepository = boltReadingRepository;
+        this.alertStore = alertStore;
+
         this.restClient = RestClient.builder()
                 .baseUrl("https://cloud.boltiot.com")
                 .build();
@@ -28,7 +40,7 @@ public class BoltService {
         this.pin = pin;
     }
 
-    public int readAnalogValue() {
+    public BoltReading readAndSaveAnalogValue() {
         Map<?, ?> response = restClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -61,6 +73,29 @@ public class BoltService {
             );
         }
 
-        return Integer.parseInt(value.toString());
+        int analogValue = Integer.parseInt(value.toString());
+
+        BoltReading reading = new BoltReading(
+                deviceId,
+                pin,
+                "light",
+                analogValue,
+                LocalDateTime.now()
+        );
+
+        BoltReading savedReading =
+                boltReadingRepository.save(reading);
+
+        alertStore.processBoltValue(
+                deviceId,
+                analogValue
+        );
+
+        return savedReading;
+    }
+
+    public List<BoltReading> getHistory() {
+        return boltReadingRepository
+                .findTop50ByOrderByCreatedAtDesc();
     }
 }
