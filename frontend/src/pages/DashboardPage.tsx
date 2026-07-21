@@ -7,6 +7,7 @@ import OrdersPanel from "../components/OrdersPanel";
 import ProductionChart from "../components/ProductionChart";
 import DashboardLayout from "../layouts/DashboardLayout";
 import BoltReadingCard from "../components/BoltReadingCard";
+import BoltHistoryChart from "../components/BoltHistoryChart";
 
 export default function DashboardPage() {
   return (
@@ -15,6 +16,9 @@ export default function DashboardPage() {
       <DashboardBanner />
       <div className="mt-6">
   <BoltReadingCard />
+</div>
+<div className="mt-6">
+  <BoltHistoryChart />
 </div>
 
       {/* KPI Cards */}

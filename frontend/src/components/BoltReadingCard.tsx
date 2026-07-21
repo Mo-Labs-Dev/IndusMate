@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 
 type BoltReading = {
+  id: number;
   deviceId: string;
   pin: string;
   sensorType: string;
   value: number;
-  timestamp: string;
+  createdAt: string;
 };
 
 export default function BoltReadingCard() {
@@ -33,7 +34,7 @@ export default function BoltReadingCard() {
 
     loadReading();
 
-    const timer = window.setInterval(loadReading, 5000);
+    const timer = window.setInterval(loadReading, 60000);
 
     return () => {
       active = false;
@@ -74,7 +75,8 @@ export default function BoltReadingCard() {
           </p>
 
           <p className="mt-1 text-xs text-slate-400">
-            Updated: {new Date(reading.timestamp).toLocaleString()}
+            Updated:{" "}
+            {new Date(reading.createdAt).toLocaleString()}
           </p>
         </div>
       )}
