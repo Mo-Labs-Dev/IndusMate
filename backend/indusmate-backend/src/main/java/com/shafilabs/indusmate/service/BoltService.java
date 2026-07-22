@@ -3,6 +3,7 @@ package com.shafilabs.indusmate.service;
 import com.shafilabs.indusmate.entity.BoltReading;
 import com.shafilabs.indusmate.repository.BoltReadingRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -16,6 +17,7 @@ public class BoltService {
     private final RestClient restClient;
     private final BoltReadingRepository boltReadingRepository;
     private final AlertStore alertStore;
+    private final SimpMessagingTemplate messagingTemplate;
 
     private final String apiKey;
     private final String deviceId;
@@ -24,12 +26,14 @@ public class BoltService {
     public BoltService(
             BoltReadingRepository boltReadingRepository,
             AlertStore alertStore,
+            SimpMessagingTemplate messagingTemplate,
             @Value("${bolt.api-key}") String apiKey,
             @Value("${bolt.device-id}") String deviceId,
             @Value("${bolt.pin:A0}") String pin
     ) {
         this.boltReadingRepository = boltReadingRepository;
         this.alertStore = alertStore;
+        this.messagingTemplate = messagingTemplate;
 
         this.restClient = RestClient.builder()
                 .baseUrl("https://cloud.boltiot.com")
@@ -73,7 +77,16 @@ public class BoltService {
             );
         }
 
-        int analogValue = Integer.parseInt(value.toString());
+        int analogValue;
+
+        try {
+            analogValue = Integer.parseInt(value.toString());
+        } catch (NumberFormatException exception) {
+            throw new IllegalStateException(
+                    "Bolt Cloud returned an invalid analog value: " + value,
+                    exception
+            );
+        }
 
         BoltReading reading = new BoltReading(
                 deviceId,
@@ -89,6 +102,16 @@ public class BoltService {
         alertStore.processBoltValue(
                 deviceId,
                 analogValue
+        );
+
+        messagingTemplate.convertAndSend(
+                "/topic/bolt-reading",
+                savedReading
+        );
+
+        messagingTemplate.convertAndSend(
+                "/topic/alerts",
+                alertStore.getAlerts()
         );
 
         return savedReading;
