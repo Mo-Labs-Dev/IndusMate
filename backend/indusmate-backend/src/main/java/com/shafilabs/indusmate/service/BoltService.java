@@ -98,4 +98,14 @@ public class BoltService {
         return boltReadingRepository
                 .findTop50ByOrderByCreatedAtDesc();
     }
+
+    public BoltReading getLatestReading() {
+        return boltReadingRepository
+                .findTopByOrderByCreatedAtDesc()
+                .orElseThrow(
+                        () -> new IllegalStateException(
+                                "No Bolt readings are available."
+                        )
+                );
+    }
 }

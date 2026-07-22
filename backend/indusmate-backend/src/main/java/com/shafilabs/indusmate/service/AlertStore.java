@@ -15,32 +15,7 @@ public class AlertStore {
     private final List<Map<String, Object>> alerts = new ArrayList<>();
 
     public AlertStore() {
-        alerts.add(createAlert(
-                "ALT-001",
-                "Machine-012 temperature high",
-                "Assembly Line 2",
-                "Critical",
-                "Open",
-                "Manual"
-        ));
-
-        alerts.add(createAlert(
-                "ALT-002",
-                "Camera 4 disconnected",
-                "Packing Area",
-                "Warning",
-                "Open",
-                "Manual"
-        ));
-
-        alerts.add(createAlert(
-                "ALT-003",
-                "Maintenance due soon",
-                "Conveyor 3",
-                "Info",
-                "Acknowledged",
-                "Manual"
-        ));
+        
     }
 
     public synchronized List<Map<String, Object>> getAlerts() {
@@ -66,22 +41,32 @@ public class AlertStore {
             String deviceId,
             int value
     ) {
-        if (value < 200) {
+        if (value < 100) {
             createBoltAlertIfMissing(
                     deviceId,
                     value,
                     "Critical",
-                    "Bolt light level critically low"
+                    "Very low light detected"
             );
             return;
         }
 
-        if (value < 500) {
+        if (value < 300) {
             createBoltAlertIfMissing(
                     deviceId,
                     value,
                     "Warning",
-                    "Bolt light level below normal"
+                    "Low light detected"
+            );
+            return;
+        }
+
+        if (value > 950) {
+            createBoltAlertIfMissing(
+                    deviceId,
+                    value,
+                    "Info",
+                    "Bright light detected"
             );
             return;
         }

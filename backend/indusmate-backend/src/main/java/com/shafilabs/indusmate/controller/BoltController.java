@@ -26,4 +26,8 @@ public class BoltController {
     public List<BoltReading> getHistory() {
         return boltService.getHistory();
     }
+    @GetMapping("/latest")
+public BoltReading getLatestReading() {
+    return boltService.getLatestReading();
+}
 }
