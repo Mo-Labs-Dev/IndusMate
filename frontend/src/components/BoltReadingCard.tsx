@@ -19,7 +19,7 @@ export default function BoltReadingCard() {
 
     async function loadReading() {
       try {
-        const response = await api.get<BoltReading>("/bolt/reading");
+        const response = await api.get<BoltReading>("/bolt/latest");
 
         if (active) {
           setReading(response.data);
@@ -27,7 +27,7 @@ export default function BoltReadingCard() {
         }
       } catch {
         if (active) {
-          setError("Could not load Bolt sensor reading.");
+          setError("Could not load the latest saved Bolt reading.");
         }
       }
     }
@@ -45,7 +45,7 @@ export default function BoltReadingCard() {
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <p className="text-sm font-medium text-emerald-600">
-        Live Bolt IoT
+        Latest Bolt IoT Reading
       </p>
 
       <h2 className="mt-1 text-xl font-semibold text-slate-900">
@@ -60,7 +60,7 @@ export default function BoltReadingCard() {
 
       {!error && !reading && (
         <p className="mt-4 text-sm text-slate-500">
-          Loading Bolt data...
+          Loading saved Bolt data...
         </p>
       )}
 
@@ -75,8 +75,7 @@ export default function BoltReadingCard() {
           </p>
 
           <p className="mt-1 text-xs text-slate-400">
-            Updated:{" "}
-            {new Date(reading.createdAt).toLocaleString()}
+            Updated: {new Date(reading.createdAt).toLocaleString()}
           </p>
         </div>
       )}
