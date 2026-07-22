@@ -1,3 +1,4 @@
+import { Bot } from "lucide-react";
 import {
   BarChart3,
   Bell,
@@ -24,6 +25,11 @@ const menuItems = [
     icon: Factory,
     path: "/production",
   },
+  {
+  name: "Mate AI",
+  path: "/mate-ai",
+  icon: Bot,
+},
   {
     name: "Alerts",
     icon: Bell,

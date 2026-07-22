@@ -9,6 +9,7 @@ import ProductionPage from "./pages/ProductionPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
 import UsersPage from "./pages/UsersPage";
+import MateAIPage from "./pages/MateAIPage";
 
 function App() {
   return (
@@ -78,6 +79,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/mate-ai"
+  element={
+    <ProtectedRoute>
+      <MateAIPage />
+    </ProtectedRoute>
+  }
+/>
 
         <Route
           path="/settings"
