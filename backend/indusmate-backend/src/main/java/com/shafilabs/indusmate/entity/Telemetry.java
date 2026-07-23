@@ -14,6 +14,11 @@ public class Telemetry {
     private String machineId;
     private Double temperature;
     private Double vibration;
+
+    private Double runningHours;
+    private Double load;
+    private Integer previousFailures;
+
     private String status;
     private LocalDateTime createdAt;
 
@@ -24,6 +29,18 @@ public class Telemetry {
     public void beforeSave() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
+        }
+
+        if (runningHours == null) {
+            runningHours = 0.0;
+        }
+
+        if (load == null) {
+            load = 0.0;
+        }
+
+        if (previousFailures == null) {
+            previousFailures = 0;
         }
     }
 
@@ -53,6 +70,30 @@ public class Telemetry {
 
     public void setVibration(Double vibration) {
         this.vibration = vibration;
+    }
+
+    public Double getRunningHours() {
+        return runningHours;
+    }
+
+    public void setRunningHours(Double runningHours) {
+        this.runningHours = runningHours;
+    }
+
+    public Double getLoad() {
+        return load;
+    }
+
+    public void setLoad(Double load) {
+        this.load = load;
+    }
+
+    public Integer getPreviousFailures() {
+        return previousFailures;
+    }
+
+    public void setPreviousFailures(Integer previousFailures) {
+        this.previousFailures = previousFailures;
     }
 
     public String getStatus() {
